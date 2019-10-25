@@ -9,13 +9,6 @@
                 <label>Nome da Lista</label>
                 <input v-model="lista.nome" class="form-control">
             </div>
-            <div class="form-group">
-                <label>Status</label>
-                <select v-model="lista.status" class="form-control">
-                    <option value="ativo">Ativo</option>
-                    <option value="inativo">Inativo</option>
-                </select>
-            </div>
             <div class="text-right mt-4">
                 <button type="button" @click="saveLista" class="btn btn-primary btn-sm m-2" v-if="!acaoEditar">Salvar
                 </button>
@@ -34,7 +27,6 @@
                     <th>#</th>
                     <th>Código</th>
                     <th>Nome</th>
-                    <th>Status</th>
                     <th>Ação</th>
                 </tr>
                 </thead>
@@ -43,7 +35,6 @@
                     <td style="width:5px">{{++index}}</td>
                     <td style="width:5px">{{lista.id}}</td>
                     <td style="width:200px">{{lista.nome}}</td>
-                    <td style="width:10px">{{lista.status}}</td>
                     <td style="width:50px">
                         <ul>
                             <li><a @click="editarLista(lista.id)"
@@ -73,15 +64,14 @@
             listas: [],
             lista: {
                 id: '',
-                nome: '',
-                status: ''
+                nome: ''
             },
             acaoEditar: false
         }),
         methods: {
             saveLista: function () {
-                if (this.lista.nome == '' || this.lista.status == '') {
-                    alert('O nome da lista e o status é obrigatorio');
+                if (this.lista.nome == '') {
+                    alert('O nome da lista  é obrigatorio');
                     return
                 }
                 let listas = this.listas;
@@ -94,7 +84,6 @@
                 this.lista = {
                     id: '',
                     nome: '',
-                    status: ''
                 };
 
                 this.getListas();
@@ -107,6 +96,13 @@
                     return obj.id != id;
                 });
                 localStorage.setItem('listas', JSON.stringify(this.listas));
+                let items = JSON.parse(localStorage.getItem('items')) || [];
+                let newItems = items.filter(function (obj) {
+                    console.log(obj.listaId != id);
+                    return obj.listaId != id;
+                });
+                localStorage.setItem('items', JSON.stringify(newItems));
+
             },
             editarLista: function (id) {
 
@@ -146,8 +142,7 @@
                 localStorage.setItem('listas', JSON.stringify(this.listas));
                 this.lista = {
                     id: '',
-                    nome: '',
-                    status: ''
+                    nome: ''
                 };
                 this.acaoEditar = false;
                 this.getListas();
@@ -157,8 +152,7 @@
             cancelarELimpar: function () {
                 this.lista = {
                     id: '',
-                    nome: '',
-                    status: ''
+                    nome: ''
                 };
                 this.acaoEditar = false;
             },

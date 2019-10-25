@@ -115,7 +115,7 @@
                 }
             },
             saveItem: function () {
-                if (this.item.nome == '' || this.item.quantidade == '' || this.item.quantidade < 1 || this.item.preco == '' || this.item.preco < 1) {
+                if (this.item.nome == '' || this.item.quantidade == '' || this.item.quantidade < 0 || this.item.preco == '' || this.item.preco < 0) {
                     alert('campos Nome,Quantidade e Preço são obrigatorios');
                     return;
                 }
