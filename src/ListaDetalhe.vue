@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="container">
-            <button type="button" class="btn btn-primary btn-sm m-2" @click="redirectHome">Voltar</button>
+            <button type="button" class="btn btn-primary btn-sm m-2" @click="redirectLista">Voltar</button>
             <div class=" col-md-4 m-auto border p-2 text-center">
                 <div class="text-center">
                     <h5>LISTA</h5>
@@ -24,11 +24,11 @@
                 </div>
                 <div class="form-group col-md-2">
                     <label>Quantidade</label>
-                    <input v-model="item.quantidade" class="form-control">
+                    <input v-model="item.quantidade" step="0" class="form-control">
                 </div>
                 <div class="form-group col-md-2">
                     <label>Preço</label>
-                    <input v-model="item.preco" class="form-control">
+                    <input v-model="item.preco" step="2" class="form-control"/>
                 </div>
                 <div class="col-md-12 text-right">
                     <button @click="saveItem" class="btn btn-primary btn-sm m-1" v-if="!acaoEditar">Salvar</button>
@@ -137,8 +137,8 @@
                     total: ''
                 }
             },
-            redirectHome: function () {
-                this.$router.push(`/`);
+            redirectLista: function () {
+                this.$router.push(`/Lista`);
             },
             getItems: function (id) {
                 let items = JSON.parse(localStorage.getItem('items')) || [];
@@ -218,6 +218,19 @@
                 },
                     this.acaoEditar = false;
             },
+        },
+        watch: {
+            'item.quantidade'(value) {
+                this.item.quantidade = value.replace(/[^\d]+/g, '');
+            },
+            'item.preco'(value) {
+                let v = value.replace(/\D/g, '');
+                v = (v / 100).toFixed(2) + '';
+
+                v = v.replace(/(\d)(\d{3}),/g, "$2.");
+                this.item.preco = v;
+            }
+
         },
         beforeMount() {
             this.getLista(this.$route.params.id);
