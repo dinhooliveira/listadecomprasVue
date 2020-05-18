@@ -14,10 +14,10 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.51998559d79976273e6d749d5fce00b8.js"
+  "/precache-manifest.72764d6a6ccebcab06d6e17e86b24c27.js"
 );
 
-workbox.core.setCacheNameDetails({prefix: "vuedinho"});
+workbox.core.setCacheNameDetails({prefix: "lista-alfamid"});
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {

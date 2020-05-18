@@ -155,9 +155,13 @@
                 this.listas = JSON.parse(localStorage.getItem('listas')) || [];
             },
             removeLista: function (id) {
+                if(!confirm("Deseja Excluir essa lista?")){
+                    return;
+                }
                 this.listas = this.listas.filter(function (obj) {
                     return obj.id != id;
                 });
+
                 localStorage.setItem('listas', JSON.stringify(this.listas));
                 let items = JSON.parse(localStorage.getItem('items')) || [];
                 let newItems = items.filter(function (obj) {

@@ -222,6 +222,9 @@
                 }
             },
             removeItem: function (id) {
+                if(!confirm("Deseja Excluir esse item?")){
+                    return;
+                }
                 this.items = this.items.filter(function (obj) {
                     return obj.id != id;
                 });
