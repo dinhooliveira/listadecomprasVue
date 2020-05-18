@@ -1,47 +1,74 @@
 <template>
     <div>
         <div class="container">
-            <button type="button" class="btn btn-primary btn-sm m-2" @click="redirectLista">Voltar</button>
-            <div class=" col-md-4 m-auto border p-2 text-center">
-                <div class="text-center">
-                    <h5>LISTA</h5>
-                    <hr>
-                    <b>ID</b> : {{lista.id}} <br>
-                    <b>Nome</b> : {{lista.nome}} <br>
-                    <b>Status</b> : {{lista.status}} <br>
-                </div>
-            </div>
-
             <div class="row border p-4 m-3">
-                <div class="col-md-12">
-                    <h5 class="text-center" v-if="!acaoEditar">Novo item</h5>
-                    <h5 class="text-center" v-if="acaoEditar">Editar item Código ({{this.item.id}})</h5>
-                    <hr/>
-                </div>
-                <div class="form-group col-md-8">
-                    <label>Nome</label>
-                    <input v-model="item.nome" class="form-control">
-                </div>
-                <div class="form-group col-md-2">
-                    <label>Quantidade</label>
-                    <input v-model="item.quantidade" step="0" class="form-control">
-                </div>
-                <div class="form-group col-md-2">
-                    <label>Preço</label>
-                    <input v-model="item.preco" step="2" class="form-control"/>
-                </div>
-                <div class="col-md-12 text-right">
-                    <button @click="saveItem" class="btn btn-primary btn-sm m-1" v-if="!acaoEditar">Salvar</button>
-                    <button @click="salvarEdicao" class="btn btn-primary btn-sm m-1" v-if="acaoEditar">Salvar Edição
-                    </button>
-                    <button @click="cancelarELimpar" class="btn btn-danger btn-sm m-1">Cancelar</button>
-                </div>
+                <div class=" col-md-12 m-auto  p-2 text-center">
+                    <div class="row">
+                        <div class="col-md-2 text-left">
+                            <button type="button" class="btn btn-primary btn-sm " @click="redirectLista">
+                                <img width="30px" src="./assets/icon/back-list.png"/>
+                            </button>
+                        </div>
+                        <div class="col-md-8">
+                            <h5>LISTA</h5>
+                        </div>
+                        <div class="col-md-2 text-right">
+                            <button type="button" class="btn btn-success btn-sm" @click="openModal">
+                                <img width="30px" src="./assets/icon/product.png"/>
+                            </button>
+                        </div>
 
+                    </div>
+
+                    <div class="text-center">
+                        <hr>
+                        <b>ID</b> : {{lista.id}} <br>
+                        <b>Nome</b> : {{lista.nome}} <br>
+                        <b>Total</b> : <b class="text-success">{{total.toFixed(2)}}</b><br>
+                    </div>
+                </div>
             </div>
+
+            <div class="modal" tabindex="-1" role="dialog" id="modal-item">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="text-center" v-if="!acaoEditar">Novo item</h5>
+                            <h5 class="text-center" v-if="acaoEditar">Editar item Código ({{this.item.id}})</h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group ">
+                                <label>Nome</label>
+                                <input v-model="item.nome" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Quantidade</label>
+                                <input v-model="item.quantidade" step="0" class="form-control">
+                            </div>
+                            <div class="form-group ">
+                                <label>Preço</label>
+                                <input v-model="item.preco" step="2" class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light p-0">
+                            <button @click="saveItem" class="btn btn-primary btn-sm m-1" v-if="!acaoEditar">
+                                <img width="30px" src="./assets/icon/save.png"/>
+                            </button>
+                            <button @click="salvarEdicao" class="btn btn-primary btn-sm m-1" v-if="acaoEditar">
+                                <img width="30px" src="./assets/icon/save-edit.png"/>
+                            </button>
+                            <button @click="cancelarELimpar" class="btn btn-danger btn-sm m-1">
+                                <img width="30px" src="./assets/icon/cancel.png"/>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-md-12" style="overflow: auto">
-                <table class="table table-bordered">
-                    <thead>
-                    <tr class="bg-light">
+                <table class="table table-bordered" v-if="!isMobile">
+                    <thead class="bg-primary text-white">
+                    <tr>
                         <th colspan="7" class="text-center">ITEMS</th>
                     </tr>
                     <tr>
@@ -62,14 +89,15 @@
                         <td>{{item.preco}}</td>
                         <td>{{item.quantidade}}</td>
                         <td>{{item.total.toFixed(2)}}</td>
-                        <td>
-                            <ul>
-                                <li><a @click="editarItem(item.id)"
-                                       class="btn btn-sm btn-primary text-white m-1">Editar</a>
-                                </li>
-                                <li><a @click="removeItem(item.id)" class="btn btn-sm btn-danger text-white">Remover</a>
-                                </li>
-                            </ul>
+                        <td >
+                            <div class="row p-1 text-center">
+                                <a @click="editarItem(item.id)" class="btn btn-sm btn-primary text-white m-1">
+                                    <img width="15px" src="./assets/icon/edit.png"/>
+                                </a>
+                                <a @click="removeItem(item.id)" class="btn btn-sm btn-danger text-white m-1">
+                                    <img width="15px" src="./assets/icon/remove.png"/>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -80,14 +108,48 @@
                     </tbody>
                 </table>
             </div>
+
+            <div v-if="isMobile" class="col-md-12 mt-3">
+                <div class="card mt-2"  v-for="(item, index) in items" :key="item.id">
+                    <div class="card-header bg-primary text-white">
+                        {{++index}}
+                        <img width="30px" src="./assets/icon/product.png" class="float-right"/>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li><b>Código:</b> {{item.id}}</li>
+                            <li><b>Item:</b> {{item.nome}}</li>
+                            <li><b>Quantidade:</b> {{item.quantidade}}</li>
+                            <li><b>Preço Unitario:</b> {{item.preco}}</li>
+                            <li><b>Preço Total:</b> {{item.total.toFixed(2)}}</li>
+                        </ul>
+                        <div class="text-right">
+                            <a @click="editarItem(item.id)"
+                               class="btn btn-sm btn-primary text-white ">
+                                <img width="30x" src="./assets/icon/edit.png"/></a>
+                            <a @click="removeItem(item.id)"
+                               class="btn btn-sm btn-danger text-white ml-1">
+                                <img width="30x" src="./assets/icon/remove.png"/>
+                            </a>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+    import checkMobile from "./check-mobile.";
+    import $ from "jquery";
+    import toastr from 'toastr';
+
     export default {
         name: "ListaDetalhe",
         data: () => ({
+            isMobile: checkMobile(),
             lista: {},
             items: [],
             item: {
@@ -101,6 +163,12 @@
             total: 0
         }),
         methods: {
+            openModal: function () {
+                $("#modal-item").show();
+            },
+            closeModal: function () {
+                $("#modal-item").hide();
+            },
             getLista: function (id) {
                 let listas = JSON.parse(localStorage.getItem('listas')) || [];
                 const lista = listas.find(function (obj) {
@@ -116,7 +184,7 @@
             },
             saveItem: function () {
                 if (this.item.nome == '' || this.item.quantidade == '' || this.item.quantidade < 0 || this.item.preco == '' || this.item.preco < 0) {
-                    alert('campos Nome,Quantidade e Preço são obrigatorios');
+                    toastr.error('campos Nome,Quantidade e Preço são obrigatorios');
                     return;
                 }
                 this.item.total = this.item.preco * this.item.quantidade;
@@ -136,6 +204,8 @@
                     preco: '',
                     total: ''
                 }
+                toastr.success("Item salvo com sucesso!");
+                this.closeModal();
             },
             redirectLista: function () {
                 this.$router.push(`/Lista`);
@@ -156,6 +226,7 @@
                     return obj.id != id;
                 });
                 localStorage.setItem('items', JSON.stringify(this.items));
+                toastr.success("Excluido com sucesso!");
                 this.getItems(this.lista.id)
             },
             editarItem: function (id) {
@@ -165,17 +236,18 @@
                 });
 
                 if (item.id == '') {
-                    alert("Não foi encontrado!");
+                    toastr.error("Não foi encontrado!");
                     return;
                 } else {
                     this.item = Object.assign(item);
                     this.acaoEditar = true;
+                    this.openModal();
                 }
 
             },
             salvarEdicao: function () {
                 if (this.item.nome == '' || this.item.quantidade == '' || this.item.quantidade < 1 || this.item.preco == '' || this.item.preco < 1) {
-                    alert('campos Nome,Quantidade e Preço são obrigatorios');
+                    toastr.error('campos Nome,Quantidade e Preço são obrigatorios');
                     return;
                 }
                 this.items;
@@ -188,7 +260,7 @@
                     }
                 }
                 if (find == false) {
-                    alert("Não foi possivel encontrar item da lista");
+                    toastr.error("Não foi possivel encontrar item da lista");
                     return;
                 }
                 this.items[i].nome = this.item.nome;
@@ -204,6 +276,8 @@
                     total: ''
                 };
                 this.acaoEditar = false;
+                toastr.success("Item salvo com sucesso!");
+                this.closeModal();
                 this.getItems(this.lista.id);
 
 
@@ -215,8 +289,9 @@
                     quantidade: '',
                     preco: '',
                     total: ''
-                },
-                    this.acaoEditar = false;
+                };
+                this.closeModal();
+                this.acaoEditar = false;
             },
         },
         watch: {
@@ -240,6 +315,7 @@
 </script>
 
 <style scoped>
+    @import "../node_modules/toastr/toastr.scss";
     ul {
         list-style: none;
 

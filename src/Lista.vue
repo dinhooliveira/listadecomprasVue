@@ -1,27 +1,45 @@
 <template>
-    <div class="container mt-4">
-        <div class="col-md-6 m-auto border p-4">
-            <h5 class="text-center" v-if="!this.acaoEditar">Nova Lista</h5>
-            <h5 class="text-center" v-if="this.acaoEditar && this.lista.id !==''">Editar Lista Código
-                ({{this.lista.id}})</h5>
-            <hr>
-            <div class="form-group">
-                <label>Nome da Lista</label>
-                <input v-model="lista.nome" class="form-control">
-            </div>
-            <div class="text-right mt-4">
-                <button type="button" @click="saveLista" class="btn btn-primary btn-sm m-2" v-if="!acaoEditar">Salvar
-                </button>
-                <button type="button" @click="salvarEdicao" class="btn btn-primary btn-sm m-2" v-if="acaoEditar">Alterar
-                </button>
-                <button type="button" @click="cancelarELimpar" class="btn btn-danger btn-sm m-2">Cancelar</button>
+    <div class="container mt-4 mb-4">
+
+        <div class="col-md-12 text-right">
+            <a @click="openModal" class="btn btn-success">
+                <img width="30x" src="./assets/icon/new-list.png"/>
+            </a>
+        </div>
+
+        <div class="modal" tabindex="-1" role="dialog" id="modal-lista">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="text-center" v-if="!this.acaoEditar">Nova Lista</h5>
+                        <h5 class="text-center" v-if="this.acaoEditar && this.lista.id !==''">Editar Lista Código
+                            ({{this.lista.id}})
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <label>Nome da Lista</label>
+                        <input v-model="lista.nome" class="form-control">
+                    </div>
+                    <div class="modal-footer bg-light p-0">
+                        <button type="button" @click="saveLista" class="btn btn-primary btn-sm m-2" v-if="!acaoEditar">
+                            <img width="30px" src="./assets/icon/save.png"/>
+                        </button>
+                        <button type="button" @click="salvarEdicao" class="btn btn-primary btn-sm m-2" v-if="acaoEditar">
+                            <img width="30px" src="./assets/icon/save-edit.png"/>
+                        </button>
+                        <button type="button" @click="cancelarELimpar" class="btn btn-danger btn-sm m-2">
+                            <img width="30px" src="./assets/icon/cancel.png"/>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
+
         <div class="col-md-12" style="overflow: auto">
-            <table class="table mt-4 table-bordered">
-                <thead class="text-left">
+            <table class="table mt-4 table-bordered" v-if="!isMobile">
+                <thead class="text-left bg-primary text-white">
                 <tr>
-                    <th colspan="5" class="text-center bg-light">LISTAS</th>
+                    <th colspan="5" class="text-center">LISTAS</th>
                 </tr>
                 <tr>
                     <th>#</th>
@@ -36,31 +54,66 @@
                     <td style="width:5px">{{lista.id}}</td>
                     <td style="width:200px">{{lista.nome}}</td>
                     <td style="width:50px">
-                        <ul>
-                            <li><a @click="editarLista(lista.id)"
-                                   class="btn btn-sm btn-primary text-white m-1">Editar</a>
-                            </li>
-                            <li><a @click="removeLista(lista.id)"
-                                   class="btn btn-sm btn-danger text-white m-1">Remover</a>
-                            </li>
-                            <li><a @click="redirectItems(lista.id)" class="btn btn-sm btn-info text-white m-1">
-                                Items</a>
-                            </li>
+                         <div class="row p-1 ">
+                            <a @click="editarLista(lista.id)"
+                               class="btn btn-sm btn-primary text-white m-1">
+                                <img width="15px"  src="./assets/icon/edit.png" />
+                            </a>
+                            <a @click="removeLista(lista.id)"
+                               class="btn btn-sm btn-danger text-white m-1">
+                                <img width="15px"  src="./assets/icon/remove.png" />
+                            </a>
+                            <a @click="redirectItems(lista.id)" class="btn btn-sm btn-info text-white m-1">
+                                <img width="15px"  src="./assets/icon/cart.png" />
+                            </a>
+                         </div>
 
-                        </ul>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
+        <div v-if="isMobile" class="col-md-12 mt-3">
+            <div class="card mt-2" v-for="(lista,index) in listas" v-bind:key="lista.id">
+                <div class="card-header bg-primary text-white">
+                    {{++index}}
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li><b>Código:</b>{{lista.id}}</li>
+                        <li><b>Lista:</b>{{lista.nome}}</li>
+                    </ul>
+                    <div class="text-right">
+                        <a @click="editarLista(lista.id)"
+                           class="btn btn-sm btn-primary text-white ">
+                            <img width="30x" src="./assets/icon/edit.png"/></a>
+                        <a @click="removeLista(lista.id)"
+                           class="btn btn-sm btn-danger text-white ml-1">
+                            <img width="30x" src="./assets/icon/remove.png"/>
+                        </a>
+                        <a @click="redirectItems(lista.id)" class="btn btn-sm btn-info text-white ml-1">
+                            <img width="30x" src="./assets/icon/cart.png"/>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
     </div>
+
 </template>
 
 <script>
 
+    import checkMobile from "./check-mobile.";
+    import $ from 'jquery';
+    import toastr from 'toastr';
+
     export default {
         name: 'Lista',
         data: () => ({
+            isMobile: checkMobile(),
             listas: [],
             lista: {
                 id: '',
@@ -68,10 +121,19 @@
             },
             acaoEditar: false
         }),
+        mounted() {
+            console.log(this.isMobile);
+        },
         methods: {
+            openModal:function(){
+               $("#modal-lista").show();
+            },
+            closeModal:function(){
+                $("#modal-lista").hide();
+            },
             saveLista: function () {
                 if (this.lista.nome == '') {
-                    alert('O nome da lista  é obrigatorio');
+                    toastr.error('O nome da lista  é obrigatorio');
                     return
                 }
                 let listas = this.listas;
@@ -85,7 +147,8 @@
                     id: '',
                     nome: '',
                 };
-
+                toastr.success("Lista salva com sucesso!");
+                this.closeModal();
                 this.getListas();
             },
             getListas: function () {
@@ -102,6 +165,7 @@
                     return obj.listaId != id;
                 });
                 localStorage.setItem('items', JSON.stringify(newItems));
+                toastr.success("Excluido com sucesso!");
 
             },
             editarLista: function (id) {
@@ -111,17 +175,18 @@
                 });
 
                 if (lista.id == '') {
-                    alert("Não foi encontrado!");
+                    toastr.error("Não foi encontrado!");
                     return;
                 } else {
                     this.lista = Object.assign(lista);
                     this.acaoEditar = true;
+                    this.openModal();
                 }
 
             },
             salvarEdicao: function () {
                 if (this.lista.nome == '' || this.lista.status == '') {
-                    alert('O nome da lista e o status é obrigatorio');
+                    toastr.error('O nome da lista e o status é obrigatorio');
                     return
                 }
                 this.listas;
@@ -134,7 +199,7 @@
                     }
                 }
                 if (find == false) {
-                    alert("Não foi possivel encontrar item da lista");
+                    toastr.error("Não foi possivel encontrar item da lista");
                     return;
                 }
                 this.listas[i].nome = this.lista.nome;
@@ -145,6 +210,8 @@
                     nome: ''
                 };
                 this.acaoEditar = false;
+                toastr.success("Lista salva com sucesso!");
+                this.closeModal();
                 this.getListas();
 
 
@@ -155,6 +222,7 @@
                     nome: ''
                 };
                 this.acaoEditar = false;
+                this.closeModal();
             },
             redirectItems: function (idLista) {
                 this.$router.push(`detalhe/${idLista}`);
@@ -166,6 +234,7 @@
     };
 </script>
 <style scoped>
+    @import "../node_modules/toastr/toastr.scss";
     ul {
         list-style: none;
 

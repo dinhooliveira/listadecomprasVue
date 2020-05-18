@@ -1,20 +1,16 @@
 import Vue from 'vue'
 import VueRouter from "vue-router";
-Vue.use(VueRouter);
-
-
 import Home from './Home.vue'
 import ListaDetalhe from "./ListaDetalhe";
 import Lista from "./Lista";
-
-
+import './registerServiceWorker'
+Vue.use(VueRouter);
 Vue.config.productionTip = false
 
 const routes = [
   { path: '/', component: Home },
   { path: '/Lista', component: Lista },
   { path: '/detalhe/:id', component: ListaDetalhe },
-
 ];
 
 const router = new VueRouter({
