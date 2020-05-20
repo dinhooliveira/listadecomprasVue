@@ -2,11 +2,16 @@
     <div class="container mt-4 mb-4">
 
         <div class="col-md-12 text-right">
-            <a @click="openModal" class="btn btn-success">
-                <img width="30x" src="./assets/icon/new-list.png"/>
+
+            <a @click="openModal" class="btn btn-success" :class="listas.length < 1 ? 'pulse' : ''">
+                <span class="text-white" v-if="listas.length < 1"> Incluir uma nova lista  </span>
+                <img width="30px" src="./assets/icon/new-list.png"/>
             </a>
         </div>
 
+        <div class="col-md-6 m-2">
+            <input class="form-control" v-model="search" v-on:keyup="doSearch" placeholder="Pesquisar...">
+        </div>
         <div class="modal" tabindex="-1" role="dialog" id="modal-lista">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -24,7 +29,8 @@
                         <button type="button" @click="saveLista" class="btn btn-primary btn-sm m-2" v-if="!acaoEditar">
                             <img width="30px" src="./assets/icon/save.png"/>
                         </button>
-                        <button type="button" @click="salvarEdicao" class="btn btn-primary btn-sm m-2" v-if="acaoEditar">
+                        <button type="button" @click="salvarEdicao" class="btn btn-primary btn-sm m-2"
+                                v-if="acaoEditar">
                             <img width="30px" src="./assets/icon/save-edit.png"/>
                         </button>
                         <button type="button" @click="cancelarELimpar" class="btn btn-danger btn-sm m-2">
@@ -35,7 +41,7 @@
             </div>
         </div>
 
-        <div class="col-md-12" style="overflow: auto">
+        <div class="col-md-12">
             <table class="table mt-4 table-bordered" v-if="!isMobile">
                 <thead class="text-left bg-primary text-white">
                 <tr>
@@ -54,19 +60,24 @@
                     <td style="width:5px">{{lista.id}}</td>
                     <td style="width:200px">{{lista.nome}}</td>
                     <td style="width:50px">
-                         <div class="row p-1 ">
+                        <div class="row p-1">
                             <a @click="editarLista(lista.id)"
                                class="btn btn-sm btn-primary text-white m-1">
-                                <img width="15px"  src="./assets/icon/edit.png" />
+                                <img width="15px" src="./assets/icon/edit.png"/>
                             </a>
                             <a @click="removeLista(lista.id)"
                                class="btn btn-sm btn-danger text-white m-1">
-                                <img width="15px"  src="./assets/icon/remove.png" />
+                                <img width="15px" src="./assets/icon/remove.png"/>
                             </a>
-                            <a @click="redirectItems(lista.id)" class="btn btn-sm btn-info text-white m-1">
-                                <img width="15px"  src="./assets/icon/cart.png" />
-                            </a>
-                         </div>
+                            <div>
+                                <a @click="redirectItems(lista.id)" class="btn btn-sm btn-info text-white m-1"
+                                   :class="totalLista(lista.id) < 1 ? 'pulse' : ''">
+                                    <img width="15px" src="./assets/icon/cart.png"/>
+                                    <span v-if="totalLista(lista.id) < 1"> Incluir items</span>
+                                    <span v-if="totalLista(lista.id) > 0">{{totalLista(lista.id)}}</span>
+                                </a>
+                            </div>
+                        </div>
 
                     </td>
                 </tr>
@@ -91,8 +102,11 @@
                            class="btn btn-sm btn-danger text-white ml-1">
                             <img width="30x" src="./assets/icon/remove.png"/>
                         </a>
-                        <a @click="redirectItems(lista.id)" class="btn btn-sm btn-info text-white ml-1">
+                        <a @click="redirectItems(lista.id)" class="btn btn-sm btn-info text-white ml-1"
+                           :class="totalLista(lista.id) < 1 ? 'pulse' : ''">
                             <img width="30x" src="./assets/icon/cart.png"/>
+                            <span v-if="totalLista(lista.id) < 1">Incluir items</span>
+                            <span v-if="totalLista(lista.id) > 0">{{totalLista(lista.id)}}</span>
                         </a>
                     </div>
 
@@ -109,6 +123,7 @@
     import checkMobile from "./check-mobile.";
     import $ from 'jquery';
     import toastr from 'toastr';
+    import store from './store';
 
     export default {
         name: 'Lista',
@@ -119,106 +134,78 @@
                 id: '',
                 nome: ''
             },
+            search:'',
             acaoEditar: false
         }),
         mounted() {
             console.log(this.isMobile);
         },
         methods: {
-            openModal:function(){
-               $("#modal-lista").show();
+            openModal: function () {
+                $("#modal-lista").show();
             },
-            closeModal:function(){
+            closeModal: function () {
                 $("#modal-lista").hide();
             },
             saveLista: function () {
-                if (this.lista.nome == '') {
-                    toastr.error('O nome da lista  é obrigatorio');
-                    return
+                try {
+                    store.lista.create(this.lista.nome);
+                    this.lista = {
+                        id: '',
+                        nome: '',
+                    };
+                    toastr.success("Lista salva com sucesso!");
+                    this.closeModal();
+                    this.getListas();
+                } catch (e) {
+                    toastr.error(e.message);
                 }
-                let listas = this.listas;
-                let idLista = localStorage.getItem('idLista') > 0 ? localStorage.getItem('idLista') : 0;
-                idLista++;
-                this.lista.id = idLista;
-                localStorage.setItem('idLista', idLista);
-                listas.push(this.lista);
-                localStorage.setItem('listas', JSON.stringify(listas));
-                this.lista = {
-                    id: '',
-                    nome: '',
-                };
-                toastr.success("Lista salva com sucesso!");
-                this.closeModal();
-                this.getListas();
+
             },
             getListas: function () {
-                this.listas = JSON.parse(localStorage.getItem('listas')) || [];
+                this.listas = store.lista.getAll();
             },
             removeLista: function (id) {
-                if(!confirm("Deseja Excluir essa lista?")){
-                    return;
-                }
-                this.listas = this.listas.filter(function (obj) {
-                    return obj.id != id;
-                });
+                try {
+                    if (!confirm("Deseja Excluir essa lista?")) {
+                        return;
+                    }
+                    store.lista.remove(id);
+                    this.listas = store.lista.getAll();
+                    toastr.success("Excluido com sucesso!");
 
-                localStorage.setItem('listas', JSON.stringify(this.listas));
-                let items = JSON.parse(localStorage.getItem('items')) || [];
-                let newItems = items.filter(function (obj) {
-                    console.log(obj.listaId != id);
-                    return obj.listaId != id;
-                });
-                localStorage.setItem('items', JSON.stringify(newItems));
-                toastr.success("Excluido com sucesso!");
+                } catch (e) {
+                    toastr.error(e.message);
+                }
+
 
             },
             editarLista: function (id) {
-
-                const lista = this.listas.find(function (obj) {
-                    return obj.id == id;
-                });
-
-                if (lista.id == '') {
-                    toastr.error("Não foi encontrado!");
-                    return;
-                } else {
+                try {
+                    const lista = store.lista.find(id);
                     this.lista = Object.assign(lista);
                     this.acaoEditar = true;
                     this.openModal();
+                } catch (e) {
+                    toastr.error(e.message);
                 }
-
             },
             salvarEdicao: function () {
-                if (this.lista.nome == '' || this.lista.status == '') {
-                    toastr.error('O nome da lista e o status é obrigatorio');
-                    return
-                }
-                this.listas;
-                let find = false;
-                let i = 0;
-                for (i; i < this.listas.length; i++) {
-                    if (this.listas[i].id == this.lista.id) {
-                        find = true;
-                        break;
-                    }
-                }
-                if (find == false) {
-                    toastr.error("Não foi possivel encontrar item da lista");
-                    return;
-                }
-                this.listas[i].nome = this.lista.nome;
-                this.listas[i].status = this.lista.status;
-                localStorage.setItem('listas', JSON.stringify(this.listas));
-                this.lista = {
-                    id: '',
-                    nome: ''
-                };
-                this.acaoEditar = false;
-                toastr.success("Lista salva com sucesso!");
-                this.closeModal();
-                this.getListas();
+                try {
+                    store.lista.update(this.lista)
 
+                    this.lista = {
+                        id: '',
+                        nome: ''
+                    };
+                    this.acaoEditar = false;
+                    toastr.success("Lista salva com sucesso!");
+                    this.closeModal();
+                    this.getListas();
 
+                } catch (e) {
+                    toastr.error(e.message);
+                }
             },
             cancelarELimpar: function () {
                 this.lista = {
@@ -230,15 +217,22 @@
             },
             redirectItems: function (idLista) {
                 this.$router.push(`detalhe/${idLista}`);
+            },
+            totalLista: function (id) {
+                return store.items.contarItemsDaLista(id);
+            },
+            doSearch:function(){
+                this.listas = store.lista.search(this.search)
             }
         },
         beforeMount() {
             this.getListas();
-        }
+        },
     };
 </script>
 <style scoped>
     @import "../node_modules/toastr/toastr.scss";
+
     ul {
         list-style: none;
 
@@ -250,5 +244,58 @@
 
     li {
         margin: 2px;
+    }
+
+    .ajuda {
+        width: 200px;
+        padding: 5px;
+        background: green;
+        color: #fff;
+        text-align: left;
+        border-radius: 15px;
+        position: absolute;
+        right: 90px;
+    }
+
+    .ajuda-items {
+        width: 120px;
+        padding: 5px;
+        background: green;
+        color: #fff;
+        text-align: left;
+        border-radius: 15px;
+        position: absolute;
+        right: -33px;
+    }
+
+
+    .pulse {
+        animation: pulse 0.7s infinite;
+        margin: 0 auto;
+        animation-direction: alternate;
+        -webkit-animation-name: pulse;
+        animation-name: pulse;
+    }
+
+    @-webkit-keyframes pulse {
+        0% {
+            -webkit-transform: scale(1);
+            -webkit-filter: brightness(100%);
+        }
+        100% {
+            -webkit-transform: scale(1.1);
+            -webkit-filter: brightness(150%);
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            filter: brightness(100%);
+        }
+        100% {
+            transform: scale(1.1);
+            filter: brightness(150%);
+        }
     }
 </style>
