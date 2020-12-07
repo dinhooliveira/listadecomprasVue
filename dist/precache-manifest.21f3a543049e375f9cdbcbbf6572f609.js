@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/alfamid.png"
   },
   {
-    "revision": "bd081222b7de66332d8e",
+    "revision": "98ec0283f53c019bd1dd",
     "url": "/css/app.9444eb09.css"
   },
   {
@@ -12,12 +12,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/css/chunk-vendors.e3ba14a1.css"
   },
   {
-    "revision": "051bcc107641c2ef3786e50cf75223fd",
+    "revision": "cdb4a417f6e105f8b0f86f4e539b79f7",
     "url": "/index.html"
   },
   {
-    "revision": "bd081222b7de66332d8e",
-    "url": "/js/app.c83df157.js"
+    "revision": "98ec0283f53c019bd1dd",
+    "url": "/js/app.48da48a1.js"
   },
   {
     "revision": "9d0bf62942e4ebd71f6e",
