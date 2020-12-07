@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.2a1934a5bb60c6639ea7bddadf3c850f.js"
+  "/precache-manifest.1acaa1b0cc6815d6a5287bde6025bd7e.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "lista-alfamid"});
