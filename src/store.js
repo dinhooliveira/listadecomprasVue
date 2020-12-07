@@ -71,7 +71,7 @@ const store = {
         },
         whatsappMobileShared(id){
            const message =  store.lista.messageWhatsapp(id);
-            window.open(`whatsapp.com://send?text=${encodeURIComponent(message)}`,'_blank');
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`,'_blank');
         },
         messageWhatsapp(id){
             const item = store.lista.find(id);
