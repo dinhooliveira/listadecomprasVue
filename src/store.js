@@ -1,3 +1,4 @@
+
 const store = {
     lista: {
         getAll: function () {
@@ -63,6 +64,28 @@ const store = {
            return this.getAll().filter(function(obj){
                  return obj.nome.indexOf(value) !== -1;
             });
+        },
+        whatsappWebShared(id){
+            const message =  store.lista.messageWhatsapp(id);
+            window.open(`https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`,'_blank');
+        },
+        whatsappMobileShared(id){
+           const message =  store.lista.messageWhatsapp(id);
+            window.open(`https://whatsapp.com/send?text=${encodeURIComponent(message)}`,'_blank');
+        },
+        messageWhatsapp(id){
+            const item = store.lista.find(id);
+            const items =  store.items.getItemsLista(id);
+            var message = `[ ${item.nome} ] \n`;
+            var numeberItem = 1;
+            items.forEach(item=>{
+                message+=`Item ${numeberItem}\n`
+                message+= `Produto :${item.nome} | Preço: ${item.preco} | Quantidade: ${item.quantidade} | Subtotal: ${item.total.toFixed(2)}\n`;
+                message+="\n"
+                numeberItem++;
+            });
+            message+=`TOTAL ${store.items.getValorTotal(id).toFixed(2)}`;
+            return message;
         }
     },
     items: {
